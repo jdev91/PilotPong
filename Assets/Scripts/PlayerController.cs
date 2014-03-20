@@ -9,9 +9,9 @@ public class PlayerController : MonoBehaviour
 	public GUIText ReleaseAngle;
 	private int count;
 	private int flicked;
-	private float moveDelta = .1f;
-	private float MAX_DRUNK_FACTOR = .1f;
-	private float MAX_FORCE = 2000;
+	private float moveDelta = .01f;
+	private float MAX_DRUNK_FACTOR = .01f;
+	private float MAX_FORCE = 650;
 	private Vector3 StartLocation = Vector3.zero;
 	private float time = 60.0f;
 	private float power = 0.0f;
@@ -58,12 +58,12 @@ public class PlayerController : MonoBehaviour
 		}
 		//set power
 		else if(flicked == 1){
-			if(Input.GetKeyUp(KeyCode.Space) || Input.GetKeyUp(KeyCode.KeypadEnter)) {
+			if(Input.GetKeyUp(KeyCode.Space) || Input.GetKeyUp(KeyCode.KeypadEnter) || Input.GetMouseButtonDown(0)) {
 				flicked = 3;
 				delta = 1;
 			}
 			else{
-				power =power +  (float) delta * 15.0f;
+				power = power + (float) delta * 15.0f;
 				if(power >= MAX_FORCE || power <= 0.0f){
 					if(power > MAX_FORCE) power = MAX_FORCE;
 					if(power < 0.0f) power = 0.0f;
@@ -75,7 +75,7 @@ public class PlayerController : MonoBehaviour
 		}
 		//set angle
 		else if(flicked == 2){
-			if(Input.GetKeyUp(KeyCode.Space) || Input.GetKeyUp(KeyCode.KeypadEnter)) {
+			if(Input.GetKeyUp(KeyCode.Space) || Input.GetKeyUp(KeyCode.KeypadEnter) || Input.GetMouseButtonDown(0)) {
 				flicked = 3;
 			}
 			else{
@@ -110,9 +110,7 @@ public class PlayerController : MonoBehaviour
 		reset ();
 
 	}
-	void OnMouseDown(){
-		flickBall ();
-	}
+
 	void SetCountText() {
 		CountText.text = "Score: " + count.ToString() + " Time: " + time;
 		string dashStr = "";
