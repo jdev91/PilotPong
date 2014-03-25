@@ -7,6 +7,8 @@ public class PlayerController : MonoBehaviour
 	public GUIText CountText;
 	public GUIText PowerBar;
 	public GUIText ReleaseAngle;
+	public Camera player1;
+	public Camera player2;
 	private int count;
 	private int flicked;
 	private float moveDelta = .01f;
@@ -18,7 +20,11 @@ public class PlayerController : MonoBehaviour
 	private float angle = 0.0f;
 	private int delta = 1;
 
+	private int whoseTurn = 1;
+
 	void start() {
+		player1.enabled = true;
+		player2.enabled = false;
 		count = 0;
 		flicked = 0;
 		reset ();
@@ -99,10 +105,10 @@ public class PlayerController : MonoBehaviour
 		else if(flicked == 3){
 			flickBall ();
 		}
-		time -= Time.deltaTime;
-		if (time < - 0 || Input.GetKey(KeyCode.R)) {
-			Application.LoadLevel(0);
-		}
+//		time -= Time.deltaTime;
+//		if (time < - 0 || Input.GetKey(KeyCode.R)) {
+//			Application.LoadLevel(0);
+//		}
 		SetCountText ();
 	}
 
@@ -121,7 +127,7 @@ public class PlayerController : MonoBehaviour
 	}
 
 	void SetCountText() {
-		CountText.text = "Score: " + count.ToString() + " Time: " + time;
+		 CountText.text = "YOLOSWAG40";
 		string dashStr = "";
 		int temp = 0;
 		while (temp < power) {
@@ -138,7 +144,7 @@ public class PlayerController : MonoBehaviour
 		
 		flicked = 4;
 		float yForce = power*(Mathf.Abs(Mathf.Sin((angle * Mathf.PI)/180)));
-		float zForce = power*(Mathf.Abs(Mathf.Cos((angle * Mathf.PI)/180)));                     
+		float zForce = whoseTurn *power*(Mathf.Abs(Mathf.Cos((angle * Mathf.PI)/180)));                     
 		rigidbody.AddForce (0,yForce,zForce);
 		print ("Total force: " + power.ToString() + " Force applied: Y " + yForce.ToString() + " Z " +zForce.ToString() + " Angle: " + angle.ToString());
 	}
@@ -148,6 +154,7 @@ public class PlayerController : MonoBehaviour
 		return Random.Range(-temp ,temp);
 	}
 	void reset(){
+		StartLocation.z = StartLocation.z + 6 * whoseTurn;
 		transform.position = StartLocation;
 		if (rigidbody != null) {
 			rigidbody.velocity = Vector3.zero;
@@ -158,6 +165,15 @@ public class PlayerController : MonoBehaviour
 		power = 0.0f;
 		angle = 0;
 		delta = 1;
+		if (whoseTurn > 0) {
+			player1.enabled = false;
+			player2.enabled = true;
+		}
+		else{
+			player1.enabled = true;
+			player2.enabled = false;
+		}
+		whoseTurn = whoseTurn * -1;
 		
 	}
 }
