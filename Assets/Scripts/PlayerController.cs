@@ -25,7 +25,10 @@ public class PlayerController : MonoBehaviour
 
 	}
 	void OnGUI () {
-		angle = GUI.HorizontalSlider (new Rect (10, 25, 100, 30), angle, 0.0f, 90.0f);
+		angle = GUI.HorizontalSlider (new Rect (10, 50, 300, 120), angle, 0.0f, 90.0f);
+		PowerBar.fontSize = 30;
+		CountText.fontSize = 30;
+		ReleaseAngle.fontSize = 30;
 	}
 	void Update(){
 		if (StartLocation == Vector3.zero) {
@@ -126,7 +129,7 @@ public class PlayerController : MonoBehaviour
 			dashStr += "-";
 		}
 		PowerBar.text = "Power: " + power.ToString() + " " +dashStr;
-		//ReleaseAngle.text = "Release Angle: " + angle.ToString();
+		ReleaseAngle.text = "Release Angle: " + angle.ToString();
 	}
 
 	void flickBall() {
@@ -155,6 +158,6 @@ public class PlayerController : MonoBehaviour
 		power = 0.0f;
 		angle = 0;
 		delta = 1;
-
+		
 	}
 }
