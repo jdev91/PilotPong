@@ -11,25 +11,29 @@ public class PlayerController : MonoBehaviour
 	private int flicked;
 	private float moveDelta = .01f;
 	private float MAX_DRUNK_FACTOR = .01f;
-	private float MAX_FORCE = 650;
+	private float MAX_FORCE = 800;
 	private Vector3 StartLocation = Vector3.zero;
 	private float time = 60.0f;
 	private float power = 0.0f;
-	private int angle = 0;
+	private float angle = 0.0f;
 	private int delta = 1;
+
 	void start() {
 		count = 0;
 		flicked = 0;
 		reset ();
 
 	}
-	
+	void OnGUI () {
+		angle = GUI.HorizontalSlider (new Rect (10, 25, 100, 30), angle, 0.0f, 90.0f);
+	}
 	void Update(){
 		if (StartLocation == Vector3.zero) {
 			StartLocation = transform.position;
 		}
 		if (Input.GetKeyUp (KeyCode.N)) {
-			power = 1400.0f;
+			power = 700.0f;
+			angle = 45.0f;
 			flickBall ();
 		}
 		//set postion
@@ -58,7 +62,7 @@ public class PlayerController : MonoBehaviour
 		}
 		//set power
 		else if(flicked == 1){
-			if(Input.GetKeyUp(KeyCode.Space) || Input.GetKeyUp(KeyCode.KeypadEnter) || Input.GetMouseButtonDown(0)) {
+			if(Input.GetKeyUp(KeyCode.Space) || Input.GetKeyUp(KeyCode.KeypadEnter)) {
 				flicked = 3;
 				delta = 1;
 			}
@@ -75,7 +79,7 @@ public class PlayerController : MonoBehaviour
 		}
 		//set angle
 		else if(flicked == 2){
-			if(Input.GetKeyUp(KeyCode.Space) || Input.GetKeyUp(KeyCode.KeypadEnter) || Input.GetMouseButtonDown(0)) {
+			if(Input.GetKeyUp(KeyCode.Space) || Input.GetKeyUp(KeyCode.KeypadEnter) ) {
 				flicked = 3;
 			}
 			else{
@@ -104,6 +108,8 @@ public class PlayerController : MonoBehaviour
 		if (other.name == "HitBox") {
 			print ("IN if statement");
 			count++;
+			//other.gameObject.SetActive(false);
+			other.transform.parent.gameObject.SetActive(false);
 		}
 		SetCountText ();
 		print (other.name);
@@ -126,12 +132,12 @@ public class PlayerController : MonoBehaviour
 	void flickBall() {
 		rigidbody.isKinematic = false;
 		rigidbody.useGravity = true;
-
+		
 		flicked = 4;
-		//float yForce = power*(Mathf.Abs(Mathf.Sin(angle)));
-		//float zForce = power*(Mathf.Abs(Mathf.Cos(angle)));                     
-		rigidbody.AddForce (0,power,power);
-		//print ("Total force: " + power.ToString() + " Force applied: " + yForce.ToString() + " " +zForce.ToString());
+		float yForce = power*(Mathf.Abs(Mathf.Sin((angle * Mathf.PI)/180)));
+		float zForce = power*(Mathf.Abs(Mathf.Cos((angle * Mathf.PI)/180)));                     
+		rigidbody.AddForce (0,yForce,zForce);
+		print ("Total force: " + power.ToString() + " Force applied: Y " + yForce.ToString() + " Z " +zForce.ToString() + " Angle: " + angle.ToString());
 	}
 	float GetDrunk()
 	{ 
