@@ -18,16 +18,15 @@ public class PlayerController : MonoBehaviour
 	private float time = 60.0f;
 	private float power = 0.0f;
 	private float angle = 0.0f;
+	private float [] lastAngle = {0.0f,0.0f};
 	private int delta = 1;
 
 	private int whoseTurn = 1;
 
 	void start() {
-		player1.enabled = true;
-		player2.enabled = false;
 		count = 0;
 		flicked = 0;
-		reset ();
+		print ("Called start\n");
 
 	}
 	void OnGUI () {
@@ -39,6 +38,7 @@ public class PlayerController : MonoBehaviour
 	void Update(){
 		if (StartLocation == Vector3.zero) {
 			StartLocation = transform.position;
+			reset ();
 		}
 		if (Input.GetKeyUp (KeyCode.N)) {
 			power = 700.0f;
@@ -155,6 +155,7 @@ public class PlayerController : MonoBehaviour
 	}
 	void reset(){
 		StartLocation.z = StartLocation.z + 6 * whoseTurn;
+		print ("Called rest:" + StartLocation.z.ToString() + "\n");
 		transform.position = StartLocation;
 		if (rigidbody != null) {
 			rigidbody.velocity = Vector3.zero;
@@ -163,17 +164,24 @@ public class PlayerController : MonoBehaviour
 		rigidbody.isKinematic = true;
 		flicked = 0;
 		power = 0.0f;
-		angle = 0;
+		//save the players angle 
+		if (whoseTurn == -1) {
+			lastAngle[0] = angle;
+			angle = lastAngle[1] + GetDrunk();
+		}
+		else{
+			lastAngle[1] = angle;
+			angle = lastAngle[0]+ GetDrunk();
+		}
 		delta = 1;
 		if (whoseTurn > 0) {
 			player1.enabled = false;
 			player2.enabled = true;
 		}
 		else{
-			player1.enabled = true;
 			player2.enabled = false;
+			player1.enabled = true;
 		}
 		whoseTurn = whoseTurn * -1;
-		
 	}
 }
