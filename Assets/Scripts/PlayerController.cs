@@ -21,6 +21,7 @@ public class PlayerController : MonoBehaviour
 	private float [] lastAngle = {0.0f,0.0f};
 	public GameObject[] blueCups;
 	public GameObject[] redCups;
+	private bool bounced = false;
 	private int delta = 1;
 
 	private int whoseTurn = 1;
@@ -108,6 +109,7 @@ public class PlayerController : MonoBehaviour
 		else if(flicked == 2){
 			if(Input.GetKeyUp(KeyCode.Space) || Input.GetKeyUp(KeyCode.KeypadEnter) ) {
 				flicked = 3;
+				bounced = false;
 			}
 			else{
 				angle = angle +  delta;
@@ -134,11 +136,27 @@ public class PlayerController : MonoBehaviour
 		//other.gameObject.SetActive(false);
 		if (other.name == "HitBox") {
 			other.transform.parent.gameObject.SetActive(false);
+			if(bounced){
+				GameObject [] cups = getOppCups();
+				foreach(GameObject cup in cups){
+					if (cup.activeInHierarchy){
+						cup.SetActive(false);
+						break;
+					}
+				}
+			}
 		}
 		SetCountText ();
 		print (other.name);
 		reset ();
 
+	}
+	void OnCollisionEnter(Collision collision) {
+		ContactPoint contact = collision.contacts[0];
+		print ("Got a collision here: " + contact.otherCollider.name + contact.thisCollider.name);
+		if (contact.otherCollider.name == "table") {
+			bounced = true;
+		}
 	}
 
 	void SetCountText() {
