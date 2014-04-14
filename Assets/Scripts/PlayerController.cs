@@ -9,22 +9,23 @@ public class PlayerController : MonoBehaviour
 	public GUIText ReleaseAngle;
 	public Camera player1;
 	public Camera player2;
-	private int count;
 	private int flicked;
 	private float moveDelta = .01f;
 	private float MAX_DRUNK_FACTOR = .01f;
-	private float MAX_FORCE = 800;
+	private float MAX_FORCE = 1000;
+	private float MIN_FORCE = 300;
 	private Vector3 StartLocation = Vector3.zero;
 	private float time = 60.0f;
 	private float power = 0.0f;
 	private float angle = 0.0f;
 	private float [] lastAngle = {0.0f,0.0f};
+	public GameObject[] blueCups;
+	public GameObject[] redCups;
 	private int delta = 1;
 
 	private int whoseTurn = 1;
 
 	void start() {
-		count = 0;
 		flicked = 0;
 		print ("Called start\n");
 
@@ -32,12 +33,26 @@ public class PlayerController : MonoBehaviour
 	void OnGUI () {
 		angle = GUI.HorizontalSlider (new Rect (10, 50, 300, 120), angle, 0.0f, 90.0f);
 		PowerBar.fontSize = 30;
+		PowerBar.color = Color.black;
 		CountText.fontSize = 30;
+		CountText.color = Color.grey;
 		ReleaseAngle.fontSize = 30;
+		ReleaseAngle.color= Color.black;
 	}
 	void Update(){
 		if (StartLocation == Vector3.zero) {
 			StartLocation = transform.position;
+			CountText.text = "";
+			reset ();
+		}
+		if (Input.GetKeyUp (KeyCode.K)) {
+			GameObject [] cups = getOppCups();
+			foreach(GameObject cup in cups){
+				if(cup.activeInHierarchy){
+					cup.SetActive(false);
+					break;
+				}
+			}
 			reset ();
 		}
 		if (Input.GetKeyUp (KeyCode.N)) {
@@ -45,16 +60,19 @@ public class PlayerController : MonoBehaviour
 			angle = 45.0f;
 			flickBall ();
 		}
+		if (Input.GetKeyUp (KeyCode.R)) {
+			Application.LoadLevel(0);
+		}
 		//set postion
 		if (flicked == 0) {
 			if(Input.GetKey(KeyCode.UpArrow)){
 				transform.position = new Vector3(transform.position.x,transform.position.y + moveDelta,transform.position.z);
 			}
 			else if(Input.GetKey(KeyCode.RightArrow)){
-				transform.position = new Vector3(transform.position.x + moveDelta,transform.position.y ,transform.position.z);
+				transform.position = new Vector3(transform.position.x + moveDelta * whoseTurn,transform.position.y ,transform.position.z);
 			}
 			else if(Input.GetKey(KeyCode.LeftArrow)){
-				transform.position = new Vector3(transform.position.x - moveDelta,transform.position.y ,transform.position.z);
+				transform.position = new Vector3(transform.position.x - moveDelta * whoseTurn,transform.position.y ,transform.position.z);
 			}
 			else if(Input.GetKey(KeyCode.DownArrow)){
 				transform.position = new Vector3(transform.position.x,transform.position.y - moveDelta,transform.position.z);
@@ -76,10 +94,10 @@ public class PlayerController : MonoBehaviour
 				delta = 1;
 			}
 			else{
-				power = power + (float) delta * 15.0f;
-				if(power >= MAX_FORCE || power <= 0.0f){
+				power = power + (float) delta * 10.0f;
+				if(power >= MAX_FORCE || power <= MIN_FORCE){
 					if(power > MAX_FORCE) power = MAX_FORCE;
-					if(power < 0.0f) power = 0.0f;
+					if(power < MIN_FORCE) power = MIN_FORCE;
 					delta = delta * -1;
 
 				}
@@ -115,9 +133,6 @@ public class PlayerController : MonoBehaviour
 	void OnTriggerEnter (Collider other) {
 		//other.gameObject.SetActive(false);
 		if (other.name == "HitBox") {
-			print ("IN if statement");
-			count++;
-			//other.gameObject.SetActive(false);
 			other.transform.parent.gameObject.SetActive(false);
 		}
 		SetCountText ();
@@ -127,15 +142,14 @@ public class PlayerController : MonoBehaviour
 	}
 
 	void SetCountText() {
-		 CountText.text = "YOLOSWAG40";
 		string dashStr = "";
 		int temp = 0;
 		while (temp < power) {
-			temp += (int) MAX_FORCE/10;
+			temp += (int) (MAX_FORCE-MIN_FORCE)/10;
 			dashStr += "-";
 		}
 		PowerBar.text = "Power: " + power.ToString() + " " +dashStr;
-		ReleaseAngle.text = "Release Angle: " + angle.ToString();
+		ReleaseAngle.text = "Angle: " + angle.ToString();
 	}
 
 	void flickBall() {
@@ -150,12 +164,14 @@ public class PlayerController : MonoBehaviour
 	}
 	float GetDrunk()
 	{ 
-		float temp = MAX_DRUNK_FACTOR * (count + 1);
+		float temp = MAX_DRUNK_FACTOR * (10-getMyCupsCount() + 1);
 		return Random.Range(-temp ,temp);
 	}
 	void reset(){
+		if (checkGameOver ()) {
+			return;
+		}
 		StartLocation.z = StartLocation.z + 6 * whoseTurn;
-		print ("Called rest:" + StartLocation.z.ToString() + "\n");
 		transform.position = StartLocation;
 		if (rigidbody != null) {
 			rigidbody.velocity = Vector3.zero;
@@ -183,5 +199,46 @@ public class PlayerController : MonoBehaviour
 			player1.enabled = true;
 		}
 		whoseTurn = whoseTurn * -1;
+	}
+	//cups on my side
+	GameObject [] getMyCups(){
+		GameObject [] cups = (whoseTurn > 0) ? blueCups : redCups;
+		return cups;
+	}
+	//opponent cups
+	GameObject [] getOppCups(){
+		GameObject [] cups = (whoseTurn < 0) ? blueCups : redCups;
+		return cups;
+	}
+	//num cups on opp side
+	int getOppCupsCount(){
+		GameObject [] cups = (whoseTurn < 0) ? blueCups : redCups;
+		return getCount (cups);
+	}
+	//num cups on opp side
+	int getMyCupsCount(){
+		GameObject [] cups = (whoseTurn > 0) ? blueCups : redCups;
+		return getCount (cups);
+	}
+	int getCount(GameObject [] cups){
+		int num = 0;
+		foreach(GameObject cup in cups){
+			if(cup.activeInHierarchy){
+				num += 1;
+			}
+		}
+		//print ("Num cups for: " + whoseTurn.ToString () + " : " + num.ToString ());
+		return num;
+	}
+	bool checkGameOver(){
+		if(getOppCupsCount() == 0){
+			string winner = (whoseTurn > 0) ? " MFG" : "NUX";
+			CountText.text = winner + " won. Press r to play another round";
+			print ("WINNER IS " + whoseTurn.ToString());
+			flicked = 4;//invalid state
+			return true;
+
+		}
+		return false;
 	}
 }
