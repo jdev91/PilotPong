@@ -23,6 +23,7 @@ public class PlayerController : MonoBehaviour
 	public GameObject[] redCups;
 	private bool bounced = false;
 	private int delta = 1;
+	private int checkRoll = 0;
 
 	private int whoseTurn = 1;
 
@@ -36,7 +37,7 @@ public class PlayerController : MonoBehaviour
 		PowerBar.fontSize = 30;
 		PowerBar.color = Color.black;
 		CountText.fontSize = 30;
-		CountText.color = Color.grey;
+		CountText.color = Color.white;
 		ReleaseAngle.fontSize = 30;
 		ReleaseAngle.color= Color.black;
 	}
@@ -62,7 +63,10 @@ public class PlayerController : MonoBehaviour
 			flickBall ();
 		}
 		if (Input.GetKeyUp (KeyCode.R)) {
-			Application.LoadLevel(0);
+			Application.LoadLevel("MiniGames");
+		}
+		if(Input.GetKeyUp (KeyCode.Q)){
+			Application.LoadLevel("main");
 		}
 		//set postion
 		if (flicked == 0) {
@@ -153,7 +157,7 @@ public class PlayerController : MonoBehaviour
 	}
 	void OnCollisionEnter(Collision collision) {
 		ContactPoint contact = collision.contacts[0];
-		print ("Got a collision here: " + contact.otherCollider.name + contact.thisCollider.name);
+		print ("Got a collision here: " + contact.otherCollider.name + "---" + contact.thisCollider.name);
 		if (contact.otherCollider.name == "table") {
 			bounced = true;
 		}
@@ -185,18 +189,26 @@ public class PlayerController : MonoBehaviour
 		float temp = MAX_DRUNK_FACTOR * (10-getMyCupsCount() + 1);
 		return Random.Range(-temp ,temp);
 	}
+	void OnCollisionStay(Collision collisionInfo) {
+		checkRoll += 1;
+		if (checkRoll > 100){
+			reset ();
+		}
+	}
+
 	void reset(){
 		if (checkGameOver ()) {
 			return;
 		}
 		StartLocation.z = StartLocation.z + 6 * whoseTurn;
 		transform.position = StartLocation;
-		if (rigidbody != null) {
-			rigidbody.velocity = Vector3.zero;
-			rigidbody.angularVelocity = Vector3.zero;
-		}
+		//if (rigidbody != null) {
+			//rigidbody.velocity = Vector3.zero;
+			//rigidbody.angularVelocity = Vector3.zero;
+		//}
 		rigidbody.isKinematic = true;
 		flicked = 0;
+		checkRoll = 0;
 		power = 0.0f;
 		//save the players angle 
 		if (whoseTurn == -1) {
@@ -251,7 +263,7 @@ public class PlayerController : MonoBehaviour
 	bool checkGameOver(){
 		if(getOppCupsCount() == 0){
 			string winner = (whoseTurn > 0) ? " MFG" : "NUX";
-			CountText.text = winner + " won. Press r to play another round";
+			CountText.text = winner + " won";
 			print ("WINNER IS " + whoseTurn.ToString());
 			flicked = 4;//invalid state
 			return true;
