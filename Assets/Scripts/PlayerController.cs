@@ -3,47 +3,53 @@ using System.Collections;
 
 public class PlayerController : MonoBehaviour 
 {
+	//game objects
 	public float speed;
 	public GUIText CountText;
 	public GUIText PowerBar;
 	public GUIText ReleaseAngle;
 	public Camera player1;
 	public Camera player2;
-	private int flicked;
+	public GameObject[] blueCups;
+	public GameObject[] redCups;
+
+	//state of turn
+	private int flicked = 0;
+
+	//constants
 	private float moveDelta = .01f;
-	private float MAX_DRUNK_FACTOR = .01f;
-	private float MAX_FORCE = 1000;
-	private float MIN_FORCE = 300;
+	private float MAX_DRUNK_FACTOR = .005f;
+	private float MAX_FORCE = 900;
+	private float MIN_FORCE = 400;
+	public  static float HEIGHT = 13.7f;
+	private float HEIGHT_DELTA = .5f;
+	public static float TABLE_WIDTH = .7f;
+	private int MAX_ANGLE = 70;
+
+	//ball status
 	private Vector3 StartLocation = Vector3.zero;
 	private float time = 60.0f;
 	private float power = 0.0f;
 	private float angle = 0.0f;
 	private float [] lastAngle = {0.0f,0.0f};
-	public GameObject[] blueCups;
-	public GameObject[] redCups;
 	private bool bounced = false;
 	private int delta = 1;
 	private int checkRoll = 0;
 
 	private int whoseTurn = 1;
 
-	void start() {
-		flicked = 0;
-		print ("Called start\n");
-
-	}
 	void OnGUI () {
-		angle = GUI.HorizontalSlider (new Rect (10, 50, 300, 120), angle, 0.0f, 90.0f);
+		angle = GUI.VerticalSlider (new Rect (10, 50, 120, 200), angle, 70.0f, -70.0f);
 		PowerBar.fontSize = 30;
-		PowerBar.color = Color.black;
+		PowerBar.color = Color.blue;
 		CountText.fontSize = 30;
 		CountText.color = Color.white;
 		ReleaseAngle.fontSize = 30;
-		ReleaseAngle.color= Color.black;
+		ReleaseAngle.color= Color.blue;
 	}
 	void Update(){
 		if (StartLocation == Vector3.zero) {
-			StartLocation = transform.position;
+			StartLocation = new Vector3(transform.position.x,HEIGHT,transform.position.z);
 			CountText.text = "";
 			reset ();
 		}
@@ -70,8 +76,17 @@ public class PlayerController : MonoBehaviour
 		}
 		//set postion
 		if (flicked == 0) {
+			//apply drunken factor
+			if(Random.Range(0,5) == 2){
+				//force ball to be in middle of screen
+				float yDrunk =  Clamp(transform.position.y + GetDrunk(),HEIGHT - HEIGHT_DELTA ,HEIGHT + HEIGHT_DELTA);
+				//force ball to be on table
+				float xDrunk =  Clamp(transform.position.x + GetDrunk(),TABLE_WIDTH * -1 ,TABLE_WIDTH);
+
+				transform.position = new Vector3(xDrunk,yDrunk,transform.position.z);
+			}
 			if(Input.GetKey(KeyCode.UpArrow)){
-				transform.position = new Vector3(transform.position.x,transform.position.y + moveDelta,transform.position.z);
+				angle = Clamp (angle + 1, MAX_ANGLE * -1, MAX_ANGLE);
 			}
 			else if(Input.GetKey(KeyCode.RightArrow)){
 				transform.position = new Vector3(transform.position.x + moveDelta * whoseTurn,transform.position.y ,transform.position.z);
@@ -80,16 +95,10 @@ public class PlayerController : MonoBehaviour
 				transform.position = new Vector3(transform.position.x - moveDelta * whoseTurn,transform.position.y ,transform.position.z);
 			}
 			else if(Input.GetKey(KeyCode.DownArrow)){
-				transform.position = new Vector3(transform.position.x,transform.position.y - moveDelta,transform.position.z);
+				angle = Clamp (angle - 1, MAX_ANGLE * -1, MAX_ANGLE);
 			} 
 			else if(Input.GetKeyUp(KeyCode.Space) || Input.GetKeyUp(KeyCode.KeypadEnter)) {
 				flicked = 1;
-			}
-			else{
-				//apply drunken factor
-				if(Random.Range(0,5) == 2){
-				transform.position = new Vector3(transform.position.x + GetDrunk(),transform.position.y + GetDrunk(),transform.position.z);
-				}
 			}
 		}
 		//set power
@@ -99,7 +108,7 @@ public class PlayerController : MonoBehaviour
 				delta = 1;
 			}
 			else{
-				power = power + (float) delta * 10.0f;
+				power = power + (float) delta * 8.0f;
 				if(power >= MAX_FORCE || power <= MIN_FORCE){
 					if(power > MAX_FORCE) power = MAX_FORCE;
 					if(power < MIN_FORCE) power = MIN_FORCE;
@@ -114,15 +123,6 @@ public class PlayerController : MonoBehaviour
 			if(Input.GetKeyUp(KeyCode.Space) || Input.GetKeyUp(KeyCode.KeypadEnter) ) {
 				flicked = 3;
 				bounced = false;
-			}
-			else{
-				angle = angle +  delta;
-				if(angle >= 90 || angle <= 0){
-					if(angle > 90) power = 90;
-					if(angle < 0.0f) power = 0.0f;
-					delta = delta * -1;
-					
-				}
 			}
 			
 		}
@@ -165,7 +165,7 @@ public class PlayerController : MonoBehaviour
 
 	void SetCountText() {
 		string dashStr = "";
-		int temp = 0;
+		float temp = MIN_FORCE;
 		while (temp < power) {
 			temp += (int) (MAX_FORCE-MIN_FORCE)/10;
 			dashStr += "-";
@@ -179,8 +179,8 @@ public class PlayerController : MonoBehaviour
 		rigidbody.useGravity = true;
 		
 		flicked = 4;
-		float yForce = power*(Mathf.Abs(Mathf.Sin((angle * Mathf.PI)/180)));
-		float zForce = whoseTurn *power*(Mathf.Abs(Mathf.Cos((angle * Mathf.PI)/180)));                     
+		float yForce = power*(Mathf.Sin((angle * Mathf.PI)/180));
+		float zForce = whoseTurn * power *(Mathf.Cos((angle * Mathf.PI)/180));                     
 		rigidbody.AddForce (0,yForce,zForce);
 		print ("Total force: " + power.ToString() + " Force applied: Y " + yForce.ToString() + " Z " +zForce.ToString() + " Angle: " + angle.ToString());
 	}
@@ -213,11 +213,11 @@ public class PlayerController : MonoBehaviour
 		//save the players angle 
 		if (whoseTurn == -1) {
 			lastAngle[0] = angle;
-			angle = lastAngle[1] + GetDrunk();
+			angle = lastAngle[1];
 		}
 		else{
 			lastAngle[1] = angle;
-			angle = lastAngle[0]+ GetDrunk();
+			angle = lastAngle[0];
 		}
 		delta = 1;
 		if (whoseTurn > 0) {
@@ -270,5 +270,13 @@ public class PlayerController : MonoBehaviour
 
 		}
 		return false;
+	}
+	public static float Clamp( float value, float min, float max )
+	{
+		return (value < min) ? min : (value > max) ? max : value;
+	}
+	public static int Clamp( int value, int min, int max )
+	{
+		return (value < min) ? min : (value > max) ? max : value;
 	}
 }
