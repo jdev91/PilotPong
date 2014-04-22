@@ -27,6 +27,7 @@ public class PlayerController : MonoBehaviour
 	private float HEIGHT_DELTA = .5f;
 	public static float TABLE_WIDTH = .7f;
 	private int MAX_ANGLE = 70;
+	private bool madeCup = false;
 
 	//ball status
 	private Vector3 StartLocation = Vector3.zero;
@@ -78,6 +79,11 @@ public class PlayerController : MonoBehaviour
 		}
 		//set postion
 		if (flicked == 0) {
+			if (madeCup) {
+				print ("I should be playing a sound");
+				audio.PlayOneShot (yay);
+				madeCup = false;
+			}
 			//apply drunken factor
 			if(Random.Range(0,5) == 2){
 				//force ball to be in middle of screen
@@ -141,20 +147,20 @@ public class PlayerController : MonoBehaviour
 	void OnTriggerEnter (Collider other) {
 		//other.gameObject.SetActive(false);
 		if (other.name == "HitBox") {
-						other.transform.parent.gameObject.SetActive (false);
-						if (bounced) {
-								GameObject [] cups = getOppCups ();
-								foreach (GameObject cup in cups) {
-										if (cup.activeInHierarchy) {
-												cup.SetActive (false);
-												print ("I should be playing a sound");
-												audio.PlayOneShot (yay);
-												break;
-										}
-								}
-						}
-				} else {
-						audio.PlayOneShot (fail);
+			other.transform.parent.gameObject.SetActive (false);
+			if (bounced) {
+				GameObject [] cups = getOppCups ();
+				foreach (GameObject cup in cups) {
+					if (cup.activeInHierarchy) {
+						cup.SetActive (false);
+						break;
+					}
+				}
+			}
+			madeCup = true;
+		}
+		else {
+			audio.PlayOneShot (fail);
 		}
 		SetCountText ();
 		print (other.name);
@@ -209,6 +215,7 @@ public class PlayerController : MonoBehaviour
 		if (checkGameOver ()) {
 			return;
 		}
+
 		StartLocation.z = StartLocation.z + 6 * whoseTurn;
 		transform.position = StartLocation;
 		//if (rigidbody != null) {
