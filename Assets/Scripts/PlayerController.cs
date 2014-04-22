@@ -257,6 +257,28 @@ public class PlayerController : MonoBehaviour
 				num += 1;
 			}
 		}
+		print ("Num cups" + num.ToString ());
+		if (num == 3) {
+			int[] active = {4,7,8};
+			int[] inactive = {0,1,2,3,5,6,9};
+			foreach(int i in active){
+				cups[i].SetActive(true);
+			}
+			foreach(int i in inactive){
+				cups[i].SetActive(false);
+			}
+		}
+		if(num == 6){
+			print("Got a 6 here bro\n");
+			int [] active = {9,8,7,5,4,2};
+			int [] inactive = {0,1,3,6};
+			foreach(int i in active){
+				cups[i].SetActive(true);
+			}
+			foreach(int i in inactive){
+				cups[i].SetActive(false);
+			}
+		}
 		//print ("Num cups for: " + whoseTurn.ToString () + " : " + num.ToString ());
 		return num;
 	}
