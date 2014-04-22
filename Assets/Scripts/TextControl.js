@@ -15,10 +15,11 @@ function OnMouseExit(){
 	renderer.material.color = c;
 }
 function OnMouseDown(){
-	if(renderer.gameObject.name == "Play"){
-		 Application.LoadLevel("MiniGames");
-	}
-	else{
+	if(renderer.gameObject.name == "Exit"){
 		Application.Quit();
+		print("shit");
+	}
+	if(renderer.gameObject.name == "Door"){
+		Application.LoadLevel("MiniGames");
 	}
 }
