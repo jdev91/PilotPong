@@ -1,0 +1,74 @@
+# 3ds Max Wavefront OBJ Exporter v0.97b - (c)2007 guruware
+# File Created: 16.02.2014 19:37:00
+
+newmtl 02___Default
+	Ns 10.000000
+	Ni 1.500000
+	d 1.000000
+	Tr 0.000000
+	Tf 1.000000 1.000000 1.000000 
+	illum 2
+	Ka 0.588000 0.588000 0.588000
+	Kd 0.588000 0.588000 0.588000
+	Ks 0.000000 0.000000 0.000000
+	Ke 0.000000 0.000000 0.000000
+	map_Ka C:\Users\kakamaka\Desktop\TurboSquid\PrimuBirou\Textures\Parquet-WhiteLux.jpg
+	map_Kd C:\Users\kakamaka\Desktop\TurboSquid\PrimuBirou\Textures\Parquet-WhiteLux.jpg
+
+newmtl wire_255255255
+	Ns 32
+	d 1
+	Tr 0
+	Tf 1 1 1
+	illum 2
+	Ka 1.000000 1.000000 1.000000
+	Kd 1.000000 1.000000 1.000000
+	Ks 0.350000 0.350000 0.350000
+
+newmtl 01___Default
+	Ns 10.000000
+	Ni 1.500000
+	d 1.000000
+	Tr 0.000000
+	Tf 1.000000 1.000000 1.000000 
+	illum 2
+	Ka 0.250980 0.050980 0.011765
+	Kd 0.250980 0.050980 0.011765
+	Ks 0.000000 0.000000 0.000000
+	Ke 0.000000 0.000000 0.000000
+	map_Ka C:\Users\kakamaka\Desktop\TurboSquid\PrimuBirou\Textures\parquet_teak_20120518_1545572153.jpg
+	map_Kd C:\Users\kakamaka\Desktop\TurboSquid\PrimuBirou\Textures\parquet_teak_20120518_1545572153.jpg
+
+newmtl wire_228153184
+	Ns 32
+	d 1
+	Tr 0
+	Tf 1 1 1
+	illum 2
+	Ka 0.894118 0.600000 0.721569
+	Kd 0.894118 0.600000 0.721569
+	Ks 0.350000 0.350000 0.350000
+
+newmtl 03___Default
+	Ns 10.000000
+	Ni 1.500000
+	d 1.000000
+	Tr 0.000000
+	Tf 1.000000 1.000000 1.000000 
+	illum 2
+	Ka 0.588000 0.588000 0.588000
+	Kd 0.588000 0.588000 0.588000
+	Ks 0.000000 0.000000 0.000000
+	Ke 0.000000 0.000000 0.000000
+	map_Ka C:\Program Files (x86)\Common Files\Autodesk Shared\Materials\Textures\1\Mats\Woods-Plastics.FinishCarpentry.Wax.Black.jpg
+	map_Kd C:\Program Files (x86)\Common Files\Autodesk Shared\Materials\Textures\1\Mats\Woods-Plastics.FinishCarpentry.Wax.Black.jpg
+
+newmtl wire_115115115
+	Ns 32
+	d 1
+	Tr 0
+	Tf 1 1 1
+	illum 2
+	Ka 0.450980 0.450980 0.450980
+	Kd 0.450980 0.450980 0.450980
+	Ks 0.350000 0.350000 0.350000

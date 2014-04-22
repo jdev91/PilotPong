@@ -12,6 +12,8 @@ public class PlayerController : MonoBehaviour
 	public Camera player2;
 	public GameObject[] blueCups;
 	public GameObject[] redCups;
+	public AudioClip fail;
+	public AudioClip yay;
 
 	//state of turn
 	private int flicked = 0;
@@ -139,16 +141,20 @@ public class PlayerController : MonoBehaviour
 	void OnTriggerEnter (Collider other) {
 		//other.gameObject.SetActive(false);
 		if (other.name == "HitBox") {
-			other.transform.parent.gameObject.SetActive(false);
-			if(bounced){
-				GameObject [] cups = getOppCups();
-				foreach(GameObject cup in cups){
-					if (cup.activeInHierarchy){
-						cup.SetActive(false);
-						break;
-					}
-				}
-			}
+						other.transform.parent.gameObject.SetActive (false);
+						if (bounced) {
+								GameObject [] cups = getOppCups ();
+								foreach (GameObject cup in cups) {
+										if (cup.activeInHierarchy) {
+												cup.SetActive (false);
+												print ("I should be playing a sound");
+												audio.PlayOneShot (yay);
+												break;
+										}
+								}
+						}
+				} else {
+						audio.PlayOneShot (fail);
 		}
 		SetCountText ();
 		print (other.name);
@@ -156,11 +162,13 @@ public class PlayerController : MonoBehaviour
 
 	}
 	void OnCollisionEnter(Collision collision) {
+		audio.Stop();
 		ContactPoint contact = collision.contacts[0];
 		print ("Got a collision here: " + contact.otherCollider.name + "---" + contact.thisCollider.name);
 		if (contact.otherCollider.name == "table") {
 			bounced = true;
 		}
+		audio.Play();
 	}
 
 	void SetCountText() {
@@ -192,6 +200,7 @@ public class PlayerController : MonoBehaviour
 	void OnCollisionStay(Collision collisionInfo) {
 		checkRoll += 1;
 		if (checkRoll > 100){
+			audio.PlayOneShot(fail);
 			reset ();
 		}
 	}
