@@ -79,64 +79,60 @@ public class PlayerController : MonoBehaviour
 		}
 		//set postion
 		if (flicked == 0) {
-			if (madeCup) {
-				print ("I should be playing a sound");
-				audio.PlayOneShot (yay);
-				madeCup = false;
-			}
-			//apply drunken factor
-			if(Random.Range(0,5) == 2){
-				//force ball to be in middle of screen
-				float yDrunk =  Clamp(transform.position.y + GetDrunk(),HEIGHT - HEIGHT_DELTA ,HEIGHT + HEIGHT_DELTA);
-				//force ball to be on table
-				float xDrunk =  Clamp(transform.position.x + GetDrunk(),TABLE_WIDTH * -1 ,TABLE_WIDTH);
+						if (madeCup) {
+								print ("I should be playing a sound");
+								audio.PlayOneShot (yay);
+								madeCup = false;
+						}
+						//apply drunken factor
+						if (Random.Range (0, 5) == 2) {
+								//force ball to be in middle of screen
+								float yDrunk = Clamp (transform.position.y + GetDrunk (), HEIGHT - HEIGHT_DELTA, HEIGHT + HEIGHT_DELTA);
+								//force ball to be on table
+								float xDrunk = Clamp (transform.position.x + GetDrunk (), TABLE_WIDTH * -1, TABLE_WIDTH);
 
-				transform.position = new Vector3(xDrunk,yDrunk,transform.position.z);
-			}
-			if(Input.GetKey(KeyCode.UpArrow)){
-				angle = Clamp (angle + 1, MAX_ANGLE * -1, MAX_ANGLE);
-			}
-			else if(Input.GetKey(KeyCode.RightArrow)){
-				transform.position = new Vector3(transform.position.x + moveDelta * whoseTurn,transform.position.y ,transform.position.z);
-			}
-			else if(Input.GetKey(KeyCode.LeftArrow)){
-				transform.position = new Vector3(transform.position.x - moveDelta * whoseTurn,transform.position.y ,transform.position.z);
-			}
-			else if(Input.GetKey(KeyCode.DownArrow)){
-				angle = Clamp (angle - 1, MAX_ANGLE * -1, MAX_ANGLE);
-			} 
-			else if(Input.GetKeyUp(KeyCode.Space) || Input.GetKeyUp(KeyCode.KeypadEnter)) {
-				flicked = 1;
-			}
-		}
+								transform.position = new Vector3 (xDrunk, yDrunk, transform.position.z);
+						}
+						if (Input.GetKey (KeyCode.UpArrow)) {
+								angle = Clamp (angle + 1, MAX_ANGLE * -1, MAX_ANGLE);
+						} else if (Input.GetKey (KeyCode.RightArrow)) {
+								transform.position = new Vector3 (transform.position.x + moveDelta * whoseTurn, transform.position.y, transform.position.z);
+						} else if (Input.GetKey (KeyCode.LeftArrow)) {
+								transform.position = new Vector3 (transform.position.x - moveDelta * whoseTurn, transform.position.y, transform.position.z);
+						} else if (Input.GetKey (KeyCode.DownArrow)) {
+								angle = Clamp (angle - 1, MAX_ANGLE * -1, MAX_ANGLE);
+						} else if (Input.GetKeyUp (KeyCode.Space) || Input.GetKeyUp (KeyCode.KeypadEnter)) {
+								flicked = 1;
+						}
+				}
 		//set power
-		else if(flicked == 1){
-			if(Input.GetKeyUp(KeyCode.Space) || Input.GetKeyUp(KeyCode.KeypadEnter)) {
-				flicked = 3;
-				delta = 1;
-			}
-			else{
-				power = power + (float) delta * 8.0f;
-				if(power >= MAX_FORCE || power <= MIN_FORCE){
-					if(power > MAX_FORCE) power = MAX_FORCE;
-					if(power < MIN_FORCE) power = MIN_FORCE;
-					delta = delta * -1;
+		else if (flicked == 1) {
+						if (Input.GetKeyUp (KeyCode.Space) || Input.GetKeyUp (KeyCode.KeypadEnter)) {
+								flicked = 3;
+								delta = 1;
+						} else {
+								power = power + (float)delta * 8.0f;
+								if (power >= MAX_FORCE || power <= MIN_FORCE) {
+										if (power > MAX_FORCE)
+												power = MAX_FORCE;
+										if (power < MIN_FORCE)
+												power = MIN_FORCE;
+										delta = delta * -1;
+
+								}
+						}
 
 				}
-			}
-
-		}
 		//set angle
-		else if(flicked == 2){
-			if(Input.GetKeyUp(KeyCode.Space) || Input.GetKeyUp(KeyCode.KeypadEnter) ) {
-				flicked = 3;
-				bounced = false;
-			}
+		else if (flicked == 2) {
+						if (Input.GetKeyUp (KeyCode.Space) || Input.GetKeyUp (KeyCode.KeypadEnter)) {
+								flicked = 3;
+								bounced = false;
+						}
 			
-		}
-		else if(flicked == 3){
-			flickBall ();
-		}
+		} else if (flicked == 3) {
+						flickBall ();
+		} 
 //		time -= Time.deltaTime;
 //		if (time < - 0 || Input.GetKey(KeyCode.R)) {
 //			Application.LoadLevel(0);
@@ -148,7 +144,8 @@ public class PlayerController : MonoBehaviour
 		//other.gameObject.SetActive(false);
 		if (other.name == "HitBox") {
 			other.transform.parent.gameObject.SetActive (false);
-			if (bounced) {
+			//not doing bounce shots
+			if (false) {
 				GameObject [] cups = getOppCups ();
 				foreach (GameObject cup in cups) {
 					if (cup.activeInHierarchy) {
@@ -300,12 +297,13 @@ public class PlayerController : MonoBehaviour
 	}
 	bool checkGameOver(){
 		if(getOppCupsCount() == 0){
-			string winner = (whoseTurn > 0) ? " MFG" : "NUX";
+			string winner = (whoseTurn > 0) ? "Crenshaw" : "Nuxoll";
 			CountText.text = winner + " won";
 			print ("WINNER IS " + whoseTurn.ToString());
 			flicked = 4;//invalid state
+			//resets ball to hand so camera bug fix
 			return true;
-
+		
 		}
 		return false;
 	}
